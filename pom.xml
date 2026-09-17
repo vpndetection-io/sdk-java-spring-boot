@@ -32,7 +32,7 @@
 
     <scm>
         <connection>scm:git:https://github.com/vpndetection-io/sdk-java-spring-boot.git</connection>
-        <developerConnection>scm:git:git@github.com:vpndetection-io/sdk-java.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:vpndetection-io/sdk-java-spring-boot.git</developerConnection>
         <url>https://github.com/vpndetection-io/sdk-java-spring-boot</url>
     </scm>
 
@@ -209,6 +209,8 @@
                             <publishingServerId>central</publishingServerId>
                             <autoPublish>true</autoPublish>
                             <waitUntil>published</waitUntil>
+                            <!-- Central can take over 30 min to publish; the 1800 s default fails a release that still goes out. -->
+                            <waitMaxTime>3600</waitMaxTime>
                         </configuration>
                     </plugin>
                 </plugins>
