@@ -6,7 +6,7 @@
 
     <groupId>io.vpndetection</groupId>
     <artifactId>vpndetection-spring-boot-starter</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2</version>
     <packaging>jar</packaging>
 
     <name>vpndetection-spring-boot-starter</name>
@@ -39,7 +39,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
-        <vpndetection.version>6.2.0</vpndetection.version>
+        <vpndetection.version>6.2.1</vpndetection.version>
         <spring.boot.version>3.5.7</spring.boot.version>
         <spring.version>6.2.12</spring.version>
         <jackson.version>2.22.2</jackson.version>
