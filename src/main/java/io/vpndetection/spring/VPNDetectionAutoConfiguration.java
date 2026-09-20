@@ -64,7 +64,7 @@ public class VPNDetectionAutoConfiguration {
                 .onMissingField(properties.getOnMissingField())
                 .ipSelector(vpndetectionIpSelector);
         if (properties.getBlockCondition() != null) {
-            options.blockCondition(properties.getBlockCondition());
+            options.blockCondition(Conditions.typed(properties.getBlockCondition()));
         }
         List<String> skip = properties.getSkipPaths();
         if (!skip.isEmpty()) {

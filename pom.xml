@@ -6,7 +6,7 @@
 
     <groupId>io.vpndetection</groupId>
     <artifactId>vpndetection-spring-boot-starter</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>vpndetection-spring-boot-starter</name>
