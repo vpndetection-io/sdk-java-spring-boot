@@ -1,4 +1,4 @@
-# [<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" width="24"/>](https://vpndetection.io/) VPNDetection Spring Boot Starter
+# [<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" height="28"/>](https://vpndetection.io/) VPNDetection Spring Boot Starter
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.vpndetection/vpndetection-spring-boot-starter.svg)](https://central.sonatype.com/artifact/io.vpndetection/vpndetection-spring-boot-starter)
 [![license](https://img.shields.io/github/license/vpndetection-io/sdk-java-spring-boot.svg)](LICENSE)
