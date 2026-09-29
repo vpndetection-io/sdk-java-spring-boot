@@ -108,7 +108,7 @@ vpndetection:
   skip-paths: ["/actuator/**", "/static/**"]
 ```
 
-Beyond a few million distinct visitors a day, stop calling the API per request: [download the dataset](https://vpndetection.io/databases) and look addresses up locally instead.
+Beyond a few million distinct visitors a day, stop calling the API per request: [download the dataset](https://vpndetection.io/#databases) and look addresses up locally instead.
 
 ## Absent is not false
 
