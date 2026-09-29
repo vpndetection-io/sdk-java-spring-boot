@@ -79,8 +79,10 @@ Spring Boot's own answer is the one to reach for first, because it rewrites `get
 
 ```yaml
 server:
-  forward-headers-strategy: framework   # or native, behind a container that does it for you
+  forward-headers-strategy: native
 ```
+
+On Tomcat, Spring Boot's default server, `native` hands the header to Tomcat's `RemoteIpValve`. It believes `X-Forwarded-For` only when the connection comes from one of `server.tomcat.remoteip.internal-proxies` (every private and loopback address unless you narrow it), and reads the header from the right, so a visitor cannot choose their own address. Do not use `framework` for this: Spring's `ForwardedHeaderFilter` takes the left-most `X-Forwarded-For` entry from whoever connects, and the visitor writes that one, because nginx, AWS's Application Load Balancer and Cloudflare append to the header rather than replace it.
 
 For an edge that writes the address into its own header, name it:
 

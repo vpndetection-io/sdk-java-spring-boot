@@ -38,9 +38,11 @@ public class VPNDetectionAutoConfiguration {
      * {@code getRemoteAddr}, the socket peer, unless a header is named.
      *
      * <p>The servlet API has no trusted-proxy setting of its own. Spring Boot's
-     * {@code server.forward-headers-strategy=native|framework} is the answer for a chain you
-     * trust, and it rewrites {@code getRemoteAddr} before this ever runs - so setting it makes
-     * this default correct rather than being something to work around.
+     * {@code server.forward-headers-strategy=native} is the answer for a chain you trust: on
+     * Tomcat it believes {@code X-Forwarded-For} only from an internal proxy, and it rewrites
+     * {@code getRemoteAddr} before this ever runs - so setting it makes this default correct
+     * rather than being something to work around. {@code framework} takes the header's
+     * left-most entry, which the visitor writes.
      */
     @Bean
     @ConditionalOnMissingBean(name = "vpndetectionIpSelector")
