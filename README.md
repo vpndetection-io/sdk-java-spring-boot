@@ -13,7 +13,7 @@ It classifies the visitor behind each request — VPN, residential proxy, Tor, h
 <dependency>
     <groupId>io.vpndetection</groupId>
     <artifactId>vpndetection-spring-boot-starter</artifactId>
-    <version>3.0.7</version>
+    <version>3.0.8</version>
 </dependency>
 ```
 

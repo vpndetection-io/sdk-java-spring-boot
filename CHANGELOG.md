@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.8 - 2026-10-01
+
+### Fixes
+
+- Require vpndetection 6.3.3 and jackson 2.22.3, past two denial-of-service advisories ([`a721c6a`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/a721c6a951ca419224e0d27c4aa0c5248519d5a4))
+
 ## 3.0.7 - 2026-09-30
 
 ### Fixes
