@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.9 - 2026-10-04
+
+### Fixes
+
+- Require vpndetection 6.4.0: a huge Retry-After no longer holds a call ([`a0eb14d`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/a0eb14d654ab5833526a7af468b103ea29470fcc))
+
 ## 3.0.8 - 2026-10-01
 
 ### Fixes
