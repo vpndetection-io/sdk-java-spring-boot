@@ -17,7 +17,7 @@ It classifies the visitor behind each request — VPN, residential proxy, Tor, h
 </dependency>
 ```
 
-Requires Java 17 or newer and Spring Boot 3.
+Requires Java 17 or newer and Spring Boot 3 or 4.
 
 You need an API key. Create one in the [console](https://app.vpndetection.io); the free tier's allowance is counted per source address, and a server is a single source address, so a key is what makes this usable in production rather than optional.
 
