@@ -31,6 +31,8 @@ import java.util.function.Function;
         matchIfMissing = true)
 @EnableConfigurationProperties(VPNDetectionProperties.class)
 public class VPNDetectionAutoConfiguration {
+    private static final System.Logger LOG = System.getLogger("io.vpndetection");
+
     private static final Selectors<HttpServletRequest> SELECTORS = new Selectors<>(
             request -> new RequestView(request::getHeader, request::getRemoteAddr));
 
@@ -58,7 +60,7 @@ public class VPNDetectionAutoConfiguration {
             VPNDetectionProperties properties,
             Function<HttpServletRequest, String> vpndetectionIpSelector) {
         Options<HttpServletRequest> options = new Options<HttpServletRequest>()
-                .apiKey(properties.getApiKey())
+                .apiKey(apiKey(properties.getApiKey()))
                 .baseUrl(properties.getBaseUrl())
                 .timeout(properties.getTimeout())
                 .retries(properties.getRetries())
@@ -75,6 +77,29 @@ public class VPNDetectionAutoConfiguration {
                     .anyMatch(pattern -> matcher.match(pattern, request.getRequestURI())));
         }
         return new Core<>(options, SELECTORS.defaultSelector());
+    }
+
+    /**
+     * The configured key, or none.
+     *
+     * <p>Spring's binder leaves a placeholder it cannot resolve as written, so
+     * {@code ${VPNDETECTION_API_KEY}} with the variable unset arrives as that text, which the API
+     * refuses on every lookup while the filter fails open and flags nobody. No key contains
+     * {@code ${}, so one that does is an unset variable: it goes out as no key, and startup says
+     * which variable. Refusing to start instead would make a missing key the app's outage.
+     */
+    static String apiKey(String configured) {
+        if (configured == null || configured.isBlank()) {
+            return null;
+        }
+        if (configured.contains("${")) {
+            LOG.log(System.Logger.Level.WARNING, "vpndetection: api-key is " + configured
+                    + ", a placeholder nothing resolved, so lookups go without a key, on the free "
+                    + "allowance. Set the variable it names, or give it an empty default "
+                    + "(${VPNDETECTION_API_KEY:}) to run without a key on purpose");
+            return null;
+        }
+        return configured;
     }
 
     @Bean

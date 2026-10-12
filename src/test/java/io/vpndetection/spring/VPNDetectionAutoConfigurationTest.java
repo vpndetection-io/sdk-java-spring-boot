@@ -14,6 +14,12 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -123,6 +129,44 @@ class VPNDetectionAutoConfigurationTest {
     }
 
     @Test
+    void aKeyPlaceholderNothingResolvedGoesOutAsNoKeyAndSaysSo() {
+        List<String> warnings = new CopyOnWriteArrayList<>();
+        Handler handler = capturing(warnings);
+        List<String> sent = new CopyOnWriteArrayList<>();
+        HttpServer server = recordingAuthorization(sent);
+        try {
+            keyed(server, "${VPNDETECTION_TEST_KEY_NOBODY_SETS}").run(context -> {
+                assertEquals(200, statusThrough(context.getBean(VPNDetectionFilter.class)));
+                assertEquals(List.of("none"), sent,
+                        "an unset variable must not go out as its own placeholder text");
+                assertTrue(warnings.stream().anyMatch(w -> w.contains("VPNDETECTION_TEST_KEY_NOBODY_SETS")),
+                        "the unset variable has to be named at startup, got " + warnings);
+            });
+        } finally {
+            Logger.getLogger("io.vpndetection").removeHandler(handler);
+            server.stop(0);
+        }
+    }
+
+    @Test
+    void aBlankKeyGoesOutAsNoKeyWithoutAWarning() {
+        List<String> warnings = new CopyOnWriteArrayList<>();
+        Handler handler = capturing(warnings);
+        List<String> sent = new CopyOnWriteArrayList<>();
+        HttpServer server = recordingAuthorization(sent);
+        try {
+            keyed(server, "${VPNDETECTION_TEST_KEY_NOBODY_SETS:}").run(context -> {
+                assertEquals(200, statusThrough(context.getBean(VPNDetectionFilter.class)));
+                assertEquals(List.of("none"), sent, "a blank key is no key, never a bare Bearer");
+                assertTrue(warnings.isEmpty(), "a default written on purpose is no mistake: " + warnings);
+            });
+        } finally {
+            Logger.getLogger("io.vpndetection").removeHandler(handler);
+            server.stop(0);
+        }
+    }
+
+    @Test
     void aConditionThatConstrainsNothingRefusesToStart() {
         HttpServer server = serving("{\"is_vpn\":true}");
         try {
@@ -134,6 +178,57 @@ class VPNDetectionAutoConfigurationTest {
         } finally {
             server.stop(0);
         }
+    }
+
+    // Answers every lookup and records the Authorization header each one carried, "none" for none.
+    private static HttpServer recordingAuthorization(List<String> sent) {
+        try {
+            HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+            byte[] bytes = ("{\"ip\":\"" + PUBLIC_IP + "\",\"is_vpn\":false}")
+                    .getBytes(StandardCharsets.UTF_8);
+            server.createContext("/", exchange -> {
+                String authorization = exchange.getRequestHeaders().getFirst("Authorization");
+                sent.add(authorization == null ? "none" : authorization);
+                exchange.getResponseHeaders().add("content-type", "application/json");
+                exchange.sendResponseHeaders(200, bytes.length);
+                exchange.getResponseBody().write(bytes);
+                exchange.close();
+            });
+            server.start();
+            return server;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static WebApplicationContextRunner keyed(HttpServer server, String apiKey) {
+        return new WebApplicationContextRunner()
+                .withConfiguration(AutoConfigurations.of(VPNDetectionAutoConfiguration.class))
+                .withPropertyValues(
+                        "vpndetection.api-key=" + apiKey,
+                        "vpndetection.base-url=http://127.0.0.1:" + server.getAddress().getPort(),
+                        "vpndetection.client-ip-header=X-Real-IP");
+    }
+
+    private static Handler capturing(List<String> warnings) {
+        Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                if (record.getLevel().intValue() >= Level.WARNING.intValue()) {
+                    warnings.add(record.getMessage());
+                }
+            }
+
+            @Override
+            public void flush() {
+            }
+
+            @Override
+            public void close() {
+            }
+        };
+        Logger.getLogger("io.vpndetection").addHandler(handler);
+        return handler;
     }
 
     private static Throwable rootCause(Throwable thrown) {

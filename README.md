@@ -27,6 +27,8 @@ vpndetection:
   api-key: ${VPNDETECTION_API_KEY}
 ```
 
+If `VPNDETECTION_API_KEY` is unset, Spring leaves `${VPNDETECTION_API_KEY}` as written. The starter then sends no key, so lookups use the free allowance, and a warning at startup names the variable. To run without a key on purpose, write `${VPNDETECTION_API_KEY:}`.
+
 The filter auto-configures itself. Read the answer anywhere downstream:
 
 ```java
