@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.11 - 2026-10-12
+
+### Fixes
+
+- Send no key when the API key variable is unset, and warn at startup ([`2d19103`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/2d191031b954c6ad3f6afe3606e14ec969b88128))
+
 ## 3.0.10 - 2026-10-10
 
 ### Fixes
