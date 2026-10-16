@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.12 - 2026-10-16
+
+### Fixes
+
+- Require vpndetection 6.4.2: the spec re-pinned to 2026.10.15 ([`be1906d`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/be1906d04c4f4cd8c4ede2b0f23ca2e3af0f5ac9))
+
 ## 3.0.11 - 2026-10-12
 
 ### Fixes
