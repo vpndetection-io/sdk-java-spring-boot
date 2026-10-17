@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.13 - 2026-10-17
+
+### Fixes
+
+- Require vpndetection 6.5.0: Retry-After read strictly, the key trimmed ([`97feea2`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/97feea22b279318679d1aaac85aa029c59a3de2a))
+
 ## 3.0.12 - 2026-10-16
 
 ### Fixes
