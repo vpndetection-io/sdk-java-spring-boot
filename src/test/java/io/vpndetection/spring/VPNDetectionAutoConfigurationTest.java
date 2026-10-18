@@ -88,7 +88,7 @@ class VPNDetectionAutoConfigurationTest {
 
     @Test
     void aNumericBoundFromYamlBlocks() {
-        HttpServer server = serving("{\"is_resproxy\":true,\"resproxy\":{\"hits\":7}}");
+        HttpServer server = serving("{\"is_vpn\":false,\"is_resproxy\":true,\"resproxy\":{\"hits\":7}}");
         try {
             runner(server,
                     "vpndetection.block-condition[0].is_resproxy=true",
@@ -102,7 +102,7 @@ class VPNDetectionAutoConfigurationTest {
 
     @Test
     void aBoundThatMissesLeavesTheVisitorThrough() {
-        HttpServer server = serving("{\"is_resproxy\":true,\"resproxy\":{\"hits\":7}}");
+        HttpServer server = serving("{\"is_vpn\":false,\"is_resproxy\":true,\"resproxy\":{\"hits\":7}}");
         try {
             runner(server,
                     "vpndetection.block-condition[0].is_resproxy=true",
