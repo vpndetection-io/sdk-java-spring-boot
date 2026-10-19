@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.15 - 2026-10-19
+
+### Fixes
+
+- Require vpndetection 6.7.0: num_ports and num_proxies in the pubproxy detail ([`e6967c8`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/e6967c8b0b102cfe3619ae8c98a40c6160d6de75))
+
 ## 3.0.14 - 2026-10-18
 
 ### Fixes
