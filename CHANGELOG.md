@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.16 - 2026-10-20
+
+### Fixes
+
+- Require vpndetection 6.8.0: client_id_issued_at is 64-bit ([`ae0b5c2`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/ae0b5c237dee1ddaa2b392e2656da266f89c7914))
+
 ## 3.0.15 - 2026-10-19
 
 ### Fixes
