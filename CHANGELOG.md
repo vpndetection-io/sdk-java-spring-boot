@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.18 - 2026-10-24
+
+### Fixes
+
+- Require vpndetection 6.9.1: block conditions match on location and asn ([`65a7980`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/65a79807094c1c02635abea4c124b43dff39ee07))
+
 ## 3.0.17 - 2026-10-20
 
 ### Features
