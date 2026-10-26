@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.19 - 2026-10-26
+
+### Fixes
+
+- Require vpndetection 6.10.0, which reads dates as RFC 3339 alone and refuses a null or an unknown license type ([`4ab4bff`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/4ab4bff9d3efbda71711e225fe86e8583767e871))
+
 ## 3.0.18 - 2026-10-24
 
 ### Fixes
