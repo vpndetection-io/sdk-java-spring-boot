@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.20 - 2026-10-30
+
+### Fixes
+
+- Require vpndetection 6.10.1: a negative retry count per call is refused ([`88a6307`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/88a6307fd2221d855059f7d15f39c34f12221dcd))
+
 ## 3.0.19 - 2026-10-26
 
 ### Fixes
