@@ -128,6 +128,23 @@ class VPNDetectionAutoConfigurationTest {
         }
     }
 
+    // The README's whole configuration is the key. Every other test here also sets a base URL and a
+    // client-address header, so none would see a starter that cannot start without them.
+    @Test
+    void theReadmesConfigurationAloneStartsTheFilter() {
+        new WebApplicationContextRunner()
+                .withConfiguration(AutoConfigurations.of(VPNDetectionAutoConfiguration.class))
+                .withPropertyValues("vpndetection.api-key=k")
+                .run(context -> {
+                    MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+                    MockHttpServletResponse response = new MockHttpServletResponse();
+                    context.getBean(VPNDetectionFilter.class).doFilter(request, response, new MockFilterChain());
+                    assertEquals(200, response.getStatus());
+                    // The mock's 127.0.0.1 is a bogon, answered with no request leaving the test.
+                    assertTrue(VPNDetectionFilter.lookup(request).orElseThrow().result().orElseThrow().isBogon());
+                });
+    }
+
     @Test
     void aKeyPlaceholderNothingResolvedGoesOutAsNoKeyAndSaysSo() {
         List<String> warnings = new CopyOnWriteArrayList<>();
