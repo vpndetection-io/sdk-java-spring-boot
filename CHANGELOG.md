@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.21 - 2026-11-02
+
+### Features
+
+- Require vpndetection 6.11.0: httpclient and httpmime no longer reach the app ([`7c11ed9`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/7c11ed9d65f0ca0cfe0865e70cf51f8baa73dc0a))
+
 ## 3.0.20 - 2026-10-30
 
 ### Fixes
