@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.23 - 2026-11-07
+
+### Features
+
+- Require vpndetection 6.12.0: downloads take the build a webhook names ([`dcbf59c`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/dcbf59c8fa657c228efdfd1c4db0a47b9bda5e0d))
+
 ## 3.0.22 - 2026-11-07
 
 ### Fixes
