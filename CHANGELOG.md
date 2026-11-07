@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.22 - 2026-11-07
+
+### Fixes
+
+- Require vpndetection 6.11.1: the device poll no longer asks again at its deadline ([`82f0bfc`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/82f0bfcb639ef55369b49305541d5a5bb7528bc6))
+
 ## 3.0.21 - 2026-11-02
 
 ### Features
