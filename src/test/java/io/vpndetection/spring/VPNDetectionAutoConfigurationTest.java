@@ -2,6 +2,7 @@ package io.vpndetection.spring;
 
 import com.sun.net.httpserver.HttpServer;
 import io.vpndetection.middleware.Core;
+import io.vpndetection.middleware.Lookup;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -22,6 +23,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -143,6 +145,34 @@ class VPNDetectionAutoConfigurationTest {
                     // The mock's 127.0.0.1 is a bogon, answered with no request leaving the test.
                     assertTrue(VPNDetectionFilter.lookup(request).orElseThrow().result().orElseThrow().isBogon());
                 });
+    }
+
+    // A starter that dropped the key would pass without this: it starts, a loopback peer is a
+    // bogon, and a 401 fails open.
+    @Test
+    void theReadmesKeyGoesOutForThePublicPeerAndAForgedHeaderIsIgnored() {
+        List<String> sent = new CopyOnWriteArrayList<>();
+        HttpServer server = recordingAuthorization(sent);
+        try {
+            new WebApplicationContextRunner()
+                    .withConfiguration(AutoConfigurations.of(VPNDetectionAutoConfiguration.class))
+                    .withPropertyValues("vpndetection.api-key=k",
+                            "vpndetection.base-url=http://127.0.0.1:" + server.getAddress().getPort())
+                    .run(context -> {
+                        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/");
+                        request.setRemoteAddr(PUBLIC_IP);
+                        request.addHeader("X-Forwarded-For", "1.1.1.1");
+                        MockHttpServletResponse response = new MockHttpServletResponse();
+                        context.getBean(VPNDetectionFilter.class).doFilter(request, response, new MockFilterChain());
+                        assertEquals(200, response.getStatus());
+                        assertEquals(List.of("Bearer k"), sent, "the configured key has to reach the API");
+                        Lookup lookup = VPNDetectionFilter.lookup(request).orElseThrow();
+                        assertEquals(PUBLIC_IP, lookup.ip().orElseThrow(), "the default is the socket peer, never the header");
+                        assertFalse(lookup.result().orElseThrow().isBogon());
+                    });
+        } finally {
+            server.stop(0);
+        }
     }
 
     @Test
