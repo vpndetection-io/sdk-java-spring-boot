@@ -94,9 +94,9 @@ public class VPNDetectionAutoConfiguration {
         }
         if (configured.contains("${")) {
             LOG.log(System.Logger.Level.WARNING, "vpndetection: api-key is " + configured
-                    + ", a placeholder nothing resolved, so lookups go without a key, on the free "
-                    + "allowance. Set the variable it names, or give it an empty default "
-                    + "(${VPNDETECTION_API_KEY:}) to run without a key on purpose");
+                    + ", a placeholder nothing resolved, so lookups go without a key, limited to 60 "
+                    + "a minute from this address. Set the variable it names, or give it an empty "
+                    + "default (${VPNDETECTION_API_KEY:}) to run without a key on purpose");
             return null;
         }
         return configured;

@@ -19,7 +19,7 @@ It classifies the visitor behind each request — VPN, residential proxy, Tor, h
 
 Requires Java 17 or newer and Spring Boot 3 or 4.
 
-You need an API key. Create one in the [console](https://app.vpndetection.io); without one the allowance is counted per source address, and a server is a single source address, so a key is what makes this usable in production rather than optional.
+You need an API key. Create one in the [console](https://app.vpndetection.io); without one, lookups are limited to 60 a minute from each source address, and a server is a single source address, so a key is what makes this usable in production rather than optional.
 
 ```yaml
 # application.yml
@@ -27,7 +27,7 @@ vpndetection:
   api-key: ${VPNDETECTION_API_KEY}
 ```
 
-If `VPNDETECTION_API_KEY` is unset, Spring leaves `${VPNDETECTION_API_KEY}` as written. The starter then sends no key, so lookups use the free allowance, and a warning at startup names the variable. To run without a key on purpose, write `${VPNDETECTION_API_KEY:}`.
+If `VPNDETECTION_API_KEY` is unset, Spring leaves `${VPNDETECTION_API_KEY}` as written. The starter then sends no key, so lookups are limited to 60 a minute from the server's address, and a warning at startup names the variable. To run without a key on purpose, write `${VPNDETECTION_API_KEY:}`.
 
 The filter auto-configures itself. Read the answer anywhere downstream:
 
@@ -116,7 +116,7 @@ Beyond a few million distinct visitors a day, stop calling the API per request: 
 
 ## Absent is not false
 
-Without a key only `ip` and `isVpn` come back, and a free key adds Tor, relay, `location()` and `asn()`. A member your plan does not include is an empty `Optional`, which means "not in your plan" rather than "checked, and no".
+Without a key a lookup leaves out `isHosting()`, `isCdn()` and the four proxy flags, and a free key leaves out `vpn()` and the detail behind each flag. A member your plan does not include is an empty `Optional`, which means "not in your plan" rather than "checked, and no".
 
 ```java
 result.isHosting().orElse(false)   // when you only want the flag
