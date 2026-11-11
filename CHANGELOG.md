@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.0.4 are described by their release commits.
 
+## 3.0.24 - 2026-11-11
+
+### Features
+
+- Require vpndetection 6.13.0: a lookup without a key answers more ([`c1b50d7`](https://github.com/vpndetection-io/sdk-java-spring-boot/commit/c1b50d7837e9373af308871d6763932977eb7c33))
+
 ## 3.0.23 - 2026-11-07
 
 ### Features
