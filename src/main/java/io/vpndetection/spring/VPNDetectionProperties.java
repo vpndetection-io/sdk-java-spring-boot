@@ -11,8 +11,8 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "vpndetection")
 public class VPNDetectionProperties {
     /**
-     * Your API key. Without one, lookups are limited to 60 a minute from each source address and a
-     * server is one source address, so this is what makes the filter usable in production.
+     * Your API key. Without one a lookup leaves out the hosting, CDN and proxy flags, so this is
+     * what makes the filter usable in production.
      */
     private String apiKey;
 
