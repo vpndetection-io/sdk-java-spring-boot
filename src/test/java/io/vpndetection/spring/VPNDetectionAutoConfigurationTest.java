@@ -130,6 +130,67 @@ class VPNDetectionAutoConfigurationTest {
         }
     }
 
+    // YAML's `confidence: [high, medium]` reaches the binder as these indexed names, which it hands
+    // over as the map {0=high, 1=medium}; read as a nested condition, that matched no visitor.
+    @Test
+    void aListValueFromYamlMatchesAnyOfItsEntries() {
+        HttpServer server = serving("{\"is_vpn\":true,\"vpn\":{\"confidence\":\"high\"}}");
+        try {
+            runner(server,
+                    "vpndetection.block-condition[0].is_vpn=true",
+                    "vpndetection.block-condition[0].vpn.confidence[0]=high",
+                    "vpndetection.block-condition[0].vpn.confidence[1]=medium").run(context ->
+                    assertEquals(403, statusThrough(context.getBean(VPNDetectionFilter.class)),
+                            "a list written in application.yml is any-of, as the README says"));
+            runner(server,
+                    "vpndetection.block-condition[0].is_vpn=true",
+                    "vpndetection.block-condition[0].vpn.confidence[0]=low",
+                    "vpndetection.block-condition[0].vpn.confidence[1]=medium").run(context ->
+                    assertEquals(200, statusThrough(context.getBean(VPNDetectionFilter.class)),
+                            "a list none of whose entries is served must not block"));
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    void aSkippedPathIsNeverLookedUp() {
+        List<String> asked = new CopyOnWriteArrayList<>();
+        HttpServer server;
+        try {
+            server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        byte[] bytes = ("{\"ip\":\"" + PUBLIC_IP + "\",\"is_vpn\":true}").getBytes(StandardCharsets.UTF_8);
+        server.createContext("/", exchange -> {
+            asked.add(exchange.getRequestURI().getPath());
+            exchange.getResponseHeaders().add("content-type", "application/json");
+            exchange.sendResponseHeaders(200, bytes.length);
+            exchange.getResponseBody().write(bytes);
+            exchange.close();
+        });
+        server.start();
+        try {
+            runner(server,
+                    "vpndetection.block-condition[0].is_vpn=true",
+                    "vpndetection.skip-paths[0]=/actuator/**").run(context -> {
+                VPNDetectionFilter filter = context.getBean(VPNDetectionFilter.class);
+                MockHttpServletRequest skipped = new MockHttpServletRequest("GET", "/actuator/health");
+                skipped.setRemoteAddr("127.0.0.1");
+                skipped.addHeader("X-Real-IP", PUBLIC_IP);
+                MockHttpServletResponse response = new MockHttpServletResponse();
+                filter.doFilter(skipped, response, new MockFilterChain());
+                assertEquals(200, response.getStatus(), "a skipped path is let through");
+                assertEquals(List.of(), asked, "a skipped path must never be looked up");
+                assertEquals(403, statusThrough(filter), "a path not skipped is still checked");
+                assertEquals(1, asked.size());
+            });
+        } finally {
+            server.stop(0);
+        }
+    }
+
     // The README's whole configuration is the key. Every other test here also sets a base URL and a
     // client-address header, so none would see a starter that cannot start without them.
     @Test

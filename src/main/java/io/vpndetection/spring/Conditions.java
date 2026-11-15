@@ -17,7 +17,9 @@ import java.util.regex.Pattern;
  * every scalar arrives as a {@code String}: {@code is_vpn: true} binds to the string "true", and
  * {@code hits: {gte: 5}} to a plain map of strings. A condition matches a served answer by type -
  * a string want only ever matches a string member - so left alone, every condition written in
- * {@code application.yml} silently matches nothing and blocks no one.
+ * {@code application.yml} silently matches nothing and blocks no one. A list fares no better: the
+ * binder hands {@code confidence: [high, medium]} over as the map {@code {0=high, 1=medium}}, which
+ * as a nested condition matches no confidence at all.
  */
 final class Conditions {
     private Conditions() {}
@@ -48,6 +50,9 @@ final class Conditions {
         if (raw instanceof Map<?, ?> map) {
             @SuppressWarnings("unchecked")
             Map<String, Object> typed = (Map<String, Object>) map;
+            if (isIndexed(typed)) {
+                return value(new ArrayList<>(indexed(typed)));
+            }
             return isBound(typed) ? bound(typed) : object(typed);
         }
         if (raw instanceof List<?> anyOf) {
@@ -74,6 +79,25 @@ final class Conditions {
             return Boolean.FALSE;
         }
         return NUMBER.matcher(trimmed).matches() ? (Object) Double.valueOf(trimmed) : text;
+    }
+
+    // No member the API serves is named by digits, so a map keyed 0 to n - 1 is a list the binder
+    // took apart, whatever order it handed the entries over in.
+    private static boolean isIndexed(Map<String, Object> raw) {
+        for (int i = 0; i < raw.size(); i++) {
+            if (!raw.containsKey(String.valueOf(i))) {
+                return false;
+            }
+        }
+        return !raw.isEmpty();
+    }
+
+    private static List<Object> indexed(Map<String, Object> raw) {
+        List<Object> out = new ArrayList<>(raw.size());
+        for (int i = 0; i < raw.size(); i++) {
+            out.add(raw.get(String.valueOf(i)));
+        }
+        return out;
     }
 
     private static boolean isBound(Map<String, Object> raw) {
