@@ -3,9 +3,9 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.vpndetection/vpndetection-spring-boot-starter.svg)](https://central.sonatype.com/artifact/io.vpndetection/vpndetection-spring-boot-starter)
 [![license](https://img.shields.io/github/license/vpndetection-io/sdk-java-spring-boot.svg)](LICENSE)
 
-The official Spring Boot starter for the [VPNDetection](https://vpndetection.io) API.
+The official Spring Boot starter for the [VPNDetection](https://vpndetection.io) API: it checks each visitor's IP for VPN, Tor and proxy use, and can block them with a 403.
 
-It classifies the visitor behind each request — VPN, residential proxy, Tor, hosting, CDN, relay — and hands the answer to your controllers. Blocking is opt-in.
+It classifies the visitor behind each request: VPN, residential proxy, Tor, hosting, CDN or relay. It hands the answer to your controllers. Blocking is opt-in.
 
 ## Getting Started
 
@@ -19,7 +19,7 @@ It classifies the visitor behind each request — VPN, residential proxy, Tor, h
 
 Requires Java 17 or newer and Spring Boot 3 or 4.
 
-You need an API key on a paid plan. Create one in the [console](https://app.vpndetection.io); without one a lookup is on Unlimited, the free plan, and leaves out the hosting, CDN and proxy flags, so a paid plan is what makes this usable in production rather than optional. A free account tries every field.
+No API key needed to start. Without one, a lookup is on Unlimited, the free plan, which answers VPN, Tor and relay detection with no daily or monthly cap. A paid plan's key adds the hosting, CDN and proxy flags and the provider behind each flag: create one in the [console](https://app.vpndetection.io). A free account tries every field.
 
 ```yaml
 # application.yml
@@ -42,7 +42,7 @@ String index(HttpServletRequest request) {
 }
 ```
 
-By default nothing is blocked. Every request gets an answer and your own code decides what that means — which is usually what you want, because whether a VPN visitor is a problem depends entirely on what they are doing.
+By default nothing is blocked. Every request gets an answer and your own code decides what to do with it, since whether a VPN visitor is a problem depends on what they're doing.
 
 ## Blocking
 
@@ -67,13 +67,13 @@ block-condition:
 
 The list is OR: any one entry blocking is enough. Values are matched by equality, strings without regard to case. A list *value* means any-of. A map of `gte`/`gt`/`lte`/`lt` compares numbers, and every bound you give must hold, so two of them are a range. Members set to `false` or `null` are ignored, so a condition states the signals you act on; one that constrains nothing would match every request, and is refused when the context starts rather than silently blocking all your traffic.
 
-In Java, build conditions with `Bound.gte(5).andLt(100)` and define your own `Core` bean — a typo in a bound is then a compile error rather than a silently ignored key.
+In Java, build conditions with `Bound.gte(5).andLt(100)` and define your own `Core` bean: a typo in a bound is then a compile error rather than a silently ignored key.
 
 Replace the refusal by defining your own `VPNDetectionFilter` bean; the auto-configuration backs off to it.
 
 ## Where the client address comes from
 
-This is the setting that decides whether any of the above works, and it is the one thing only you can get right.
+Get this setting right, or none of the above works.
 
 By default the filter uses `HttpServletRequest#getRemoteAddr`, the socket peer. **The servlet API has no trusted-proxy setting of its own.** Behind nginx, a load balancer, or a CDN, every visitor arrives wearing your proxy's address, and that is the address that gets checked: VPN visitors pass unnoticed, and if it is a hosting address, a hosting rule blocks everyone. nginx on the same machine is `127.0.0.1` and a load balancer usually has a private address, which the filter answers locally without a lookup, flagging nobody and logging a warning.
 
@@ -93,7 +93,7 @@ vpndetection:
   client-ip-header: CF-Connecting-IP
 ```
 
-A callable cannot live in YAML, so anything more exotic — a chain depth, your own logic — means defining a `Function<HttpServletRequest, String>` bean named `vpndetectionIpSelector`. Every bean here is `@ConditionalOnMissingBean`, so yours replaces ours rather than colliding with it.
+A callable cannot live in YAML, so anything more exotic, a chain depth or your own logic, means defining a `Function<HttpServletRequest, String>` bean named `vpndetectionIpSelector`. Every bean here is `@ConditionalOnMissingBean`, so yours replaces ours rather than colliding with it.
 
 If the address resolves to a private one, the filter says so once. That is expected locally and is the signal to fix your configuration anywhere else.
 
@@ -103,7 +103,7 @@ The request is let through, and the reason is on `lookup.error()`. Our outage sh
 
 ## Cost and latency
 
-Answers are cached for an hour, so a returning visitor costs nothing, and private addresses never leave the process. A cache miss is one request to our API, bounded at 2500 ms by default and not retried — on a request path, failing open quickly beats holding a visitor while we try again.
+Answers are cached for an hour, so a returning visitor costs nothing, and private addresses never leave the process. A cache miss is one request to our API, bounded at 2500 ms by default and not retried: on a request path, failing open fast beats holding a visitor while we retry.
 
 Skip what you do not care about:
 
